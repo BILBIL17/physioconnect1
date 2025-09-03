@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Physio Connect</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+    <!-- SVG Icons Definition -->
+    <svg width="0" height="0" style="display:none;">
+        <symbol id="icon-graph" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="icon-journal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+        <symbol id="icon-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+    </svg>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo"><i class="fas fa-running"></i> <span data-translate-key="appTitle"></span></div>
+            <div class="header-actions">
+                <div class="language-selector" id="language-selector"><div class="language-flag">ID</div></div>
+                <i class="fas fa-user-circle profile-icon" id="profile-icon"></i>
+            </div>
+        </header>
+
+        <main class="app-content">
+            <!-- VIEW: HOME -->
+            <section id="home-view" class="view active">
+                <div class="welcome-banner">
+                    <h1 data-translate-key="welcomeUser"></h1><p data-translate-key="welcomeSubtitle"></p>
+                </div>
+                <div class="card">
+                    <div class="card-header"><svg class="icon"><use href="#icon-graph"/></svg><h2 data-translate-key="progressTitle"></h2></div>
+                    <div class="progress-chart-container"><canvas id="progress-chart"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-bell icon"></i><h2 data-translate-key="reminderTitle"></h2></div>
+                    <ul id="exercise-list" class="exercise-list"></ul>
+                    <p class="exercise-note" data-translate-key="exerciseNote"></p>
+                </div>
+            </section>
+
+            <!-- VIEW: CHAT -->
+            <section id="chat-view" class="view">
+                <div class="chat-container">
+                    <div id="chat-box" class="chat-box"><div class="chat-message bot"><div class="bubble" data-translate-key="welcomeChat"></div></div></div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" data-translate-key-placeholder="chatPlaceholder" autocomplete="off">
+                        <button id="send-button" aria-label="Kirim"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: TERAPI & REKAM MEDIS -->
+            <section id="terapi-view" class="view">
+                 <div class="card">
+                    <div class="card-header"><i class="fas fa-clipboard-list icon"></i><h2 data-translate-key="medicalRecordTitle"></h2></div>
+                    <div id="rekam-medis-list"><p class="empty-state" data-translate-key="emptyRecord"></p></div>
+                    <button id="generate-pdf-btn" class="btn-primary" data-translate-key="generatePDF"></button>
+                 </div>
+                 <div class="card">
+                    <div class="card-header"><svg class="icon"><use href="#icon-journal"/></svg><h2 data-translate-key="jurnalTitle"></h2></div>
+                    <div class="jurnal-list">
+                        <a href="https://journals2.ums.ac.id/index.php/fisiomu/index" target="_blank" class="jurnal-link"><span data-translate-key="jurnalUMS"></span><svg class="icon"><use href="#icon-external-link"/></svg></a>
+                        <a href="https://www.jospt.org/" target="_blank" class="jurnal-link"><span data-translate-key="jurnalJOSPT"></span><svg class="icon"><use href="#icon-external-link"/></svg></a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: AI COACH & ANALYSIS -->
+            <section id="ai-view" class="view">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-robot icon"></i><h2 data-translate-key="aiTitle"></h2></div>
+                    <div class="ai-controls">
+                        <div>
+                            <label><input type="radio" name="ai-mode" value="exercise" checked> <span data-translate-key="aiModeGeneral"></span></label>
+                            <label><input type="radio" name="ai-mode" value="frontal"> <span data-translate-key="aiModeFront"></span></label>
+                        </div>
+                        <button id="switch-camera-btn" class="camera-btn" data-translate-key-title="switchCamera"><i class="fas fa-camera-rotate"></i></button>
+                    </div>
+                    <div class="webcam-container"><video id="webcam-feed" autoplay playsinline muted></video><canvas id="pose-overlay"></canvas></div>
+                    <div class="ai-actions">
+                        <button id="start-ai-session-btn" data-translate-key="startSession"></button>
+                        <button id="capture-btn" class="btn-secondary" data-translate-key="captureAndAnalyze" disabled></button>
+                    </div>
+                </div>
+                <div id="analysis-section" class="card" style="display: none;">
+                    <h3 data-translate-key="analysisResultTitle"></h3>
+                    <canvas id="analysis-canvas"></canvas>
+                    <div id="analysis-results-text"></div>
+                    <textarea id="analysis-notes" data-translate-key-placeholder="analysisNotes"></textarea>
+                    <button id="save-analysis-btn" class="btn-primary" data-translate-key="saveToRecord"></button>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="#home-view" class="active"><i class="fas fa-home nav-icon"></i><span data-translate-key="navHome"></span></a>
+            <a href="#chat-view"><i class="fas fa-comments nav-icon"></i><span data-translate-key="navChat"></span></a>
+            <a href="#terapi-view"><i class="fas fa-notes-medical nav-icon"></i><span data-translate-key="navTerapi"></span></a>
+            <a href="#ai-view"><i class="fas fa-robot nav-icon"></i><span data-translate-key="navAi"></span></a>
+        </nav>
+    </div>
+
+    <!-- MODAL & DRAWER -->
+    <div id="overlay" class="overlay"></div>
+    <div id="profileDrawer" class="drawer">
+      <header><span data-translate-key="drawerTitle"></span><i class="fas fa-times" style="cursor:pointer"></i></header>
+      <div class="content">
+        <label data-translate-key="drawerNameLabel"></label><input type="text" id="drawerName">
+        <label data-translate-key="drawerEmailLabel"></label><input type="email" id="drawerEmail">
+        <label data-translate-key="drawerGenderLabel"></label>
+        <select id="drawerGender"><option value="" data-translate-key="drawerGenderSelect"></option><option value="male" data-translate-key="drawerGenderMale"></option><option value="female" data-translate-key="drawerGenderFemale"></option></select>
+        <label data-translate-key="drawerAgeLabel"></label><input type="number" min="1" max="120" id="drawerAge">
+      </div>
+      <div class="bottom-actions">
+        <button class="logout" id="drawer-logout-btn" data-translate-key="drawerLogoutBtn"></button><button class="save" id="drawer-save-btn" data-translate-key="drawerSaveBtn"></button>
+      </div>
+    </div>
+    
+    <div id="reminder-modal" class="modal">
+        <div class="modal-content">
+            <h3 data-translate-key="setReminderTitle"></h3>
+            <p id="reminder-exercise-title"></p>
+            <input type="time" id="reminder-time-input">
+            <div class="modal-actions">
+                <button id="cancel-reminder-btn" class="btn-secondary" data-translate-key="cancel"></button>
+                <button id="save-reminder-btn" class="btn-primary" data-translate-key="save"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
