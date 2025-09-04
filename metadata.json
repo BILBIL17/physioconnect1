@@ -1,0 +1,7 @@
+{
+  "name": "Physio Connect",
+  "description": "A physiotherapy companion app for tracking progress, scheduling exercises, and getting AI-powered analysis of your posture.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
