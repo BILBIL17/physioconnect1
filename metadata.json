@@ -1,0 +1,7 @@
+{
+  "name": "Physcio Connect",
+  "description": "An AI-powered physiotherapy assistant to help you with exercise programs, finding nearby clinics, analyzing your posture, and more.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
